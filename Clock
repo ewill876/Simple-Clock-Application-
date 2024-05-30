@@ -1,0 +1,68 @@
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+class Clock {
+    private volatile boolean running;
+
+    // Method used for starting the clock
+    public void start() {
+        running = true;
+
+        // Start the background updating thread
+        Thread updateThread = new Thread(this::updateTime);
+        updateThread.setPriority(Thread.MIN_PRIORITY); // Lower priority
+        updateThread.start();
+
+        // Start the clock display thread
+        Thread displayThread = new Thread(this::displayTime);
+        displayThread.setPriority(Thread.MAX_PRIORITY); // Higher priority
+        displayThread.start();
+    }
+
+    // Method to stop the clock
+    public void stop() {
+        running = false;
+    }
+
+    // Method to continuously update the time in the background
+    private void updateTime() {
+        while (running) {
+            try {
+                Thread.sleep(1000); // Sleep for 1 second
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Method to display the time continuously
+    private void displayTime() {
+        while (running) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy");
+            String currentTime = dateFormat.format(new Date());
+            System.out.println(currentTime);
+
+            try {
+                Thread.sleep(1000); // Sleep for 1 second
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Clock clock = new Clock();
+        clock.start();
+
+        // Let the clock run for 10 seconds
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        clock.stop();
+    }
+}
